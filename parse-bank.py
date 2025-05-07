@@ -27,10 +27,29 @@ def get_description(date_info):
     
     return description
 
+
+def parse_bank_statement_raw(text):
+    # This function should be customized based on the structure of your bank statement
+    lines = text.split('\n')
+    transactions = []
+    for line in lines:
+        # Example parsing logic (customize as needed)
+        if "DATE" in line and "DESCRIPTION" in line and "AMOUNT" in line:
+            continue # Skip header line
+        parts = line.split()
+        if len(parts) >= 3:
+            date = parts[0]
+            description = " ".join(parts[1:-1])
+            amount = parts[-1]
+            transactions.append([date, description, amount])
+    return transactions
+
+
 def parse_bank_statement(text):
     # Regular expression to match the transaction format
     transaction_pattern = re.compile(r'(\w{3} \d{2} \w{3} \d{2}.*?\n.*?\d+\.\d{2})')
     transactions = transaction_pattern.findall(text)
+    print(f"Found {len(transactions)} transactions")
     parsed_transactions = []
     for transaction in transactions:
         lines = transaction.split('\n')
@@ -52,7 +71,7 @@ def save_to_csv(transactions, csv_path):
         writer.writerows(transactions)
 
 if __name__ == "__main__":
-    pdf_path = './statements/2025_02_February_Account_Statement.pdf'
+    pdf_path = './statements/2025_04_April_Account_Statement.pdf'
     csv_path = './output.csv'
     
     text = extract_text_from_pdf(pdf_path)
